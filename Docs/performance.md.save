@@ -1,0 +1,30 @@
+Liq Performance Benchmark
+
+Hardware
+
+- CPU: Intel(R) Core(TM) i3-5005U CPU @ 2.00GHz
+- RAM: 8 GB
+- OS: Zorin OS
+
+Model
+
+- Llama 3.2 3B
+- Runtime: Ollama
+
+Results
+
+- First response time: 50.76 seconds
+- Maximum Python memory usage: 40,584 KB (~40 MB)
+- Total system RAM: 7.7 GiB
+- RAM used during test: 5.4 GiB
+- Available RAM during test: 2.2 GiB
+- Swap usage: Minimal (3.9 GiB available)
+- Works correctly on CPU.
+- Suitable for development, but optimization is needed to improve response speed.
+
+Notes
+
+- Liq successfully runs locally on an HP laptop with 8 GB RAM.
+- The first response is slower because the model loads and performs inference on the CPU.
+- Future benchmarks will compare Llama 3.2 3B with Phi-3 Mini and other local models.
+- Performance will be measured again after implementing optimizations such as reduced chat history, streaming responses, and model comparison.
