@@ -1,26 +1,7 @@
-import ollama
+from chat import SYSTEM_PROMPT, get_reply
+from voice import listen
 
-MODEL = "llama3.2:3b"
-
-SYSTEM_PROMPT = """
-You are Liq, a helpful local AI assistant built by Faniel Negasi.
-Facts:
-- Faniel Negasi is your creator.
-- Faniel Negasi is male.
-- When referring to Faniel Negasi, use male pronouns (he, him, his).
-
-Your role:
-- Help with coding and technology questions.
-- Be concise and accurate.
-- Give step-by-step instructions when appropriate.
-- Remember the current conversation context.
-- Be friendly and professional.
-
-Never claim to be ChatGPT.
-Always introduce yourself as Liq if asked who you are.
-"""
-
-def chat():
+def main():
     messages = [
         {
             "role": "system",
@@ -28,52 +9,69 @@ def chat():
         }
     ]
 
-    print("Liq assistant started.")
-    print("Type 'exit', 'quit', or 'bye' to stop.\n")
+    print("\n=========================")
+    print("        LIQ ASSISTANT")
+    print("=========================")
+    print("1. Type")
+    print("2. Voice")
+    print("3. Exit\n")
 
     while True:
         try:
-            user_input = input("You: ").strip()
+            choice = input("Choose (1/2/3): ").strip()
 
-            if user_input.lower() in ["exit", "quit", "bye"]:
+            if choice == "1":
+                user_input = input("You: ").strip()
+
+                if user_input.lower() in ["exit", "quit", "bye"]:
+                    print("Goodbye.")
+                    break
+
+                if not user_input:
+                    continue
+
+                try:
+                    print("\nLiq is thinking...\n")
+                    reply = get_reply(messages, user_input)
+                    print(f"Liq: {reply}\n")
+                except Exception as e:
+                    print(f"\nLiq Error: {e}")
+                    print("Please make sure Ollama is running.\n")
+
+            elif choice == "2":
+                try:
+                    user_input = listen()
+
+                    if not user_input:
+                        print("I could not hear anything clearly.\n")
+                        continue
+
+                    print(f"\nYou: {user_input}\n")
+
+                    if user_input.lower() in ["exit", "quit", "bye"]:
+                        print("Goodbye.")
+                        break
+
+                    print("Liq is thinking...\n")
+                    reply = get_reply(messages, user_input)
+                    print(f"Liq: {reply}\n")
+
+                except Exception as e:
+                    print(f"\nVoice Error: {e}\n")
+
+            elif choice == "3":
                 print("Goodbye.")
                 break
 
-            if not user_input:
-                continue
-
-            messages.append({
-                "role": "user",
-                "content": user_input
-            })
-
-            print("\nLiq is thinking...\n")
-
-            try:
-                response = ollama.chat(
-                    model=MODEL,
-                    messages=messages
-                )
-
-                assistant_reply = response["message"]["content"]
-                print(f"Liq: {assistant_reply}\n")
-
-                messages.append({
-                    "role": "assistant",
-                    "content": assistant_reply
-                })
-
-            except Exception as e:
-                print(f"\nLiq Error: {e}")
-                print("Please make sure Ollama is running.\n")
+            else:
+                print("Please choose 1, 2, or 3.\n")
 
         except KeyboardInterrupt:
             print("\nGoodbye.")
             break
-
         except EOFError:
             print("\nGoodbye.")
             break
 
 if __name__ == "__main__":
-    chat()
+    main()
