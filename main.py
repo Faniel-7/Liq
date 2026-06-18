@@ -1,5 +1,6 @@
 from chat import SYSTEM_PROMPT, get_reply
 from voice import listen
+from speak import speak
 
 def main():
     messages = [
@@ -34,6 +35,8 @@ def main():
                     print("\nLiq is thinking...\n")
                     reply = get_reply(messages, user_input)
                     print(f"Liq: {reply}\n")
+                    speak(reply)
+
                 except Exception as e:
                     print(f"\nLiq Error: {e}")
                     print("Please make sure Ollama is running.\n")
@@ -55,6 +58,7 @@ def main():
                     print("Liq is thinking...\n")
                     reply = get_reply(messages, user_input)
                     print(f"Liq: {reply}\n")
+                    speak(reply)
 
                 except Exception as e:
                     print(f"\nVoice Error: {e}\n")
