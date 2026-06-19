@@ -14,7 +14,7 @@ def main():
     print("        LIQ ASSISTANT")
     print("=========================")
     print("1. Type mode")
-    print("2. Voice mode")
+    print("2. Push-to-talk voice mode")
     print("3. Exit\n")
 
     while True:
@@ -41,10 +41,17 @@ def main():
                         print(f"\nLiq Error: {e}\n")
 
             elif choice == "2":
-                print("\nVoice mode started.")
-                print("Say 'exit', 'quit', or 'bye' to stop.\n")
+                print("\nPush-to-talk mode started.")
+                print("Press Enter to talk.")
+                print("Type 'exit', 'quit', or 'bye' to stop.\n")
 
                 while True:
+                    trigger = input("Press Enter to record... ").strip()
+
+                    if trigger.lower() in ["exit", "quit", "bye"]:
+                        print("Goodbye.")
+                        return
+
                     try:
                         user_input = listen()
 
