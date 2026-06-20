@@ -14,7 +14,7 @@ def main():
     print("        LIQ ASSISTANT")
     print("=========================")
     print("1. Type mode")
-    print("2. Push-to-talk voice mode")
+    print("2. Manual voice mode")
     print("3. Exit\n")
 
     while True:
@@ -22,8 +22,16 @@ def main():
             choice = input("Choose (1/2/3): ").strip()
 
             if choice == "1":
+                print("\nType mode started.")
+                print("Type 'back' to return to the menu.")
+                print("Type 'exit', 'quit', or 'bye' to stop Liq.\n")
+
                 while True:
                     user_input = input("You: ").strip()
+
+                    if user_input.lower() == "back":
+                        print()
+                        break
 
                     if user_input.lower() in ["exit", "quit", "bye"]:
                         print("Goodbye.")
@@ -41,35 +49,35 @@ def main():
                         print(f"\nLiq Error: {e}\n")
 
             elif choice == "2":
-                print("\nPush-to-talk mode started.")
-                print("Press Enter to talk.")
-                print("Type 'exit', 'quit', or 'bye' to stop.\n")
+                print("\nManual voice mode started.")
+                print("Press Enter to start recording.")
+                print("Press Enter again to stop recording.")
+                print("Type 'exit', 'quit', or 'bye' at the start prompt to stop.\n")
 
                 while True:
-                    trigger = input("Press Enter to record... ").strip()
+                    start = input("Press Enter to start recording...").strip()
 
-                    if trigger.lower() in ["exit", "quit", "bye"]:
+                    if start.lower() in ["exit", "quit", "bye"]:
+                        print("Goodbye.")
+                        return
+
+                    user_input = listen()
+
+                    if not user_input:
+                        print("I could not hear anything clearly.\n")
+                        continue
+
+                    print(f"\nYou: {user_input}\n")
+
+                    if user_input.lower() in ["exit", "quit", "bye"]:
                         print("Goodbye.")
                         return
 
                     try:
-                        user_input = listen()
-
-                        if not user_input:
-                            print("I could not hear anything clearly.\n")
-                            continue
-
-                        print(f"\nYou: {user_input}\n")
-
-                        if user_input.lower() in ["exit", "quit", "bye"]:
-                            print("Goodbye.")
-                            return
-
                         print("Liq is thinking...\n")
                         reply = get_reply(messages, user_input)
                         print(f"Liq: {reply}\n")
                         speak(reply)
-
                     except Exception as e:
                         print(f"\nVoice Error: {e}\n")
 
