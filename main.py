@@ -1,7 +1,8 @@
 from chat import SYSTEM_PROMPT, get_reply
 from voice import listen
 from speak import speak
-from app_control import open_app
+from app_control import open_app, CURRENT_OS_LABEL
+
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -34,6 +35,7 @@ def main():
     print("\n=========================")
     print("        LIQ ASSISTANT")
     print("=========================")
+    print(f"Current OS: {CURRENT_OS_LABEL}")
     print("1. Type mode")
     print("2. Manual voice mode")
     print("3. Exit\n")
