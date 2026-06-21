@@ -1,8 +1,10 @@
+from Liq.calculator import calculate
 from chat import SYSTEM_PROMPT, get_reply
 from voice import listen
 from speak import speak
 from app_control import open_app, CURRENT_OS_LABEL
 from system_info import handle_system_question
+from calculator import calculate
 
 
 def handle_local_command(user_input: str):
@@ -65,7 +67,13 @@ def main():
 
                     if not user_input:
                         continue
-
+                    
+                    
+                    calc_reply = calculate(user_input)
+                    if calc_reply:
+                         print(f"\nLiq: {calc_reply}\n")
+                         speak(calc_reply)
+                         continue
                    
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
@@ -114,6 +122,12 @@ def main():
                     if user_input.lower() in ["exit", "quit", "bye"]:
                         print("Goodbye.")
                         return
+                    
+                    calc_reply = calculate(user_input)
+                    if calc_reply:
+                         print(f"\nLiq: {calc_reply}\n")
+                         speak(calc_reply)
+                         continue
                    
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
