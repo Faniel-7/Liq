@@ -1,7 +1,8 @@
-import os
 import platform
 import socket
 import shutil
+from datetime import datetime
+
 import psutil
 
 
@@ -14,12 +15,16 @@ def get_hostname():
 
 
 def get_cpu_info():
-    return platform.processor()
+    cpu = platform.processor()
+    if cpu:
+        return cpu
+    return "Unknown CPU"
 
 
 def get_ram_info():
-    total = psutil.virtual_memory().total / (1024 ** 3)
-    available = psutil.virtual_memory().available / (1024 ** 3)
+    mem = psutil.virtual_memory()
+    total = mem.total / (1024 ** 3)
+    available = mem.available / (1024 ** 3)
 
     return {
         "total": round(total, 2),
@@ -29,12 +34,21 @@ def get_ram_info():
 
 def get_disk_info():
     disk = shutil.disk_usage("/")
-
     return {
         "total": round(disk.total / (1024 ** 3), 2),
         "used": round(disk.used / (1024 ** 3), 2),
         "free": round(disk.free / (1024 ** 3), 2)
     }
+
+
+def get_time_info():
+    now = datetime.now()
+    return now.strftime("%I:%M %p").lstrip("0")
+
+
+def get_date_info():
+    now = datetime.now()
+    return now.strftime("%A, %B %d, %Y")
 
 
 def handle_system_question(question: str):
@@ -51,7 +65,6 @@ def handle_system_question(question: str):
 
     if "ram" in q or "memory" in q:
         ram = get_ram_info()
-
         return (
             f"You have {ram['total']} GB of RAM. "
             f"{ram['available']} GB is currently available."
@@ -59,12 +72,20 @@ def handle_system_question(question: str):
 
     if "disk" in q or "storage" in q or "space" in q:
         disk = get_disk_info()
-
         return (
             f"Disk space:\n"
             f"Total: {disk['total']} GB\n"
             f"Used: {disk['used']} GB\n"
             f"Free: {disk['free']} GB"
         )
+
+    if "time" in q:
+        return f"The current time is {get_time_info()}."
+
+    if "date" in q or "today" in q or "day is it" in q:
+        return f"Today is {get_date_info()}."
+
+    if "weather" in q:
+        return "Weather support is not connected yet. We can add that later with a web source."
 
     return None
