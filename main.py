@@ -2,6 +2,7 @@ from chat import SYSTEM_PROMPT, get_reply
 from voice import listen
 from speak import speak
 from app_control import open_app, CURRENT_OS_LABEL
+from system_info import handle_system_question
 
 
 def handle_local_command(user_input: str):
@@ -24,6 +25,7 @@ def handle_local_command(user_input: str):
 
     return None
 
+
 def main():
     messages = [
         {
@@ -36,6 +38,7 @@ def main():
     print("        LIQ ASSISTANT")
     print("=========================")
     print(f"Current OS: {CURRENT_OS_LABEL}")
+    print()
     print("1. Type mode")
     print("2. Manual voice mode")
     print("3. Exit\n")
@@ -63,6 +66,7 @@ def main():
                     if not user_input:
                         continue
 
+                   
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
                         success, message = local_result
@@ -70,11 +74,19 @@ def main():
                         speak(message)
                         continue
 
+                    
+                    system_reply = handle_system_question(user_input)
+                    if system_reply:
+                        print(f"\nLiq: {system_reply}\n")
+                        speak(system_reply)
+                        continue
+
                     try:
                         print("\nLiq is thinking...\n")
                         reply = get_reply(messages, user_input)
                         print(f"Liq: {reply}\n")
                         speak(reply)
+
                     except Exception as e:
                         print(f"\nLiq Error: {e}\n")
 
@@ -102,7 +114,7 @@ def main():
                     if user_input.lower() in ["exit", "quit", "bye"]:
                         print("Goodbye.")
                         return
-
+                   
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
                         success, message = local_result
@@ -110,13 +122,21 @@ def main():
                         speak(message)
                         continue
 
+                    system_reply = handle_system_question(user_input)
+                    if system_reply:
+                        print(f"\nLiq: {system_reply}\n")
+                        speak(system_reply)
+                        continue
+
                     try:
                         print("Liq is thinking...\n")
                         reply = get_reply(messages, user_input)
                         print(f"Liq: {reply}\n")
                         speak(reply)
+
                     except Exception as e:
                         print(f"\nVoice Error: {e}\n")
+
             elif choice == "3":
                 print("Goodbye.")
                 return
@@ -127,9 +147,11 @@ def main():
         except KeyboardInterrupt:
             print("\nGoodbye.")
             return
+
         except EOFError:
             print("\nGoodbye.")
             return
+
 
 if __name__ == "__main__":
     main()
