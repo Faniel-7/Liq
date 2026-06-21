@@ -1,55 +1,82 @@
+import platform
 import subprocess
 from pathlib import Path
 
+CURRENT_OS = platform.system().lower()
+CURRENT_OS_LABEL = "Zorin OS (Linux)" if CURRENT_OS == "linux" else platform.platform()
+
 HOME_DIR = str(Path.home())
+
+
+def _launch(commands):
+    last_error = None
+
+    for cmd in commands:
+        try:
+            subprocess.Popen(
+                cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            return True, None
+        except Exception as e:
+            last_error = e
+
+    return False, last_error
+
 
 def open_app(command: str):
     cmd = command.strip().lower()
 
-    if cmd in ["vscode", "vs code", "visual studio code", "open vscode", "open vs code"]:
-        commands = [
-            ["code"],
-            ["flatpak", "run", "com.visualstudio.code"],
-        ]
-        app_name = "VS Code"
+    if CURRENT_OS == "windows":
+        registry = {
+            "vscode": [["code"], ["Code"]],
+            "browser": [["cmd", "/c", "start", "", "https://www.google.com"]],
+            "file manager": [["explorer"]],
+            "terminal": [["cmd"], ["powershell"]],
+            "telegram": [["telegram"], ["Telegram"]],
+        }
 
-    elif cmd in ["browser", "web browser", "internet", "open browser", "open web browser"]:
-        commands = [
-            ["xdg-open", "https://www.google.com"],
-        ]
-        app_name = "browser"
-
-    elif cmd in ["file manager", "files", "folder", "open file manager", "open files"]:
-        commands = [
-            ["xdg-open", HOME_DIR],
-        ]
-        app_name = "file manager"
-
-    elif cmd in ["terminal", "open terminal"]:
-        commands = [
-            ["gnome-terminal"],
-            ["x-terminal-emulator"],
-        ]
-        app_name = "terminal"
-
-    elif cmd in ["telegram", "open telegram", "launch telegram"]:
-        commands = [
-            ["telegram-desktop"],
-            ["telegram"],
-            ["flatpak", "run", "org.telegram.desktop"],
-            ["snap", "run", "telegram-desktop"],
-        ]
-        app_name = "Telegram"
+    elif CURRENT_OS == "darwin":
+        registry = {
+            "vscode": [["open", "-a", "Visual Studio Code"]],
+            "browser": [["open", "https://www.google.com"]],
+            "file manager": [["open", HOME_DIR]],
+            "terminal": [["open", "-a", "Terminal"]],
+            "telegram": [["open", "-a", "Telegram"]],
+        }
 
     else:
+        registry = {
+            "vscode": [["code"], ["flatpak", "run", "com.visualstudio.code"]],
+            "browser": [["xdg-open", "https://www.google.com"]],
+            "file manager": [["xdg-open", HOME_DIR]],
+            "terminal": [["gnome-terminal"], ["x-terminal-emulator"], ["konsole"], ["xfce4-terminal"]],
+            "telegram": [["flatpak", "run", "org.telegram.desktop"]],
+        }
+
+    aliases = {
+        "vscode": ["vscode", "vs code", "visual studio code"],
+        "browser": ["browser", "web browser", "internet"],
+        "file manager": ["file manager", "files", "folder"],
+        "terminal": ["terminal"],
+        "telegram": ["telegram"],
+    }
+
+    app_key = None
+    for key, names in aliases.items():
+        if cmd in names:
+            app_key = key
+            break
+
+    if app_key is None:
         return False, "I do not know how to open that app yet."
 
-    last_error = None
-    for c in commands:
-        try:
-            subprocess.Popen(c)
-            return True, f"Opening {app_name}."
-        except Exception as e:
-            last_error = e
+    success, error = _launch(registry[app_key])
 
-    return False, f"Could not open {app_name}: {last_error}"
+    if success:
+        pretty_name = "VS Code" if app_key == "vscode" else app_key.title()
+        return True, f"Opening {pretty_name}."
+
+    pretty_name = "VS Code" if app_key == "vscode" else app_key.title()
+    return False, f"Could not open {pretty_name}: {error}"
