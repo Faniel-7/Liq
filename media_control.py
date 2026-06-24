@@ -49,7 +49,7 @@ def parse_command(text: str):
 
     return action, player
 
-def run_music(action, player=None):
+def run_music_command(action, player=None):
     players = get_players()
 
     if CURRENT_OS != "linux":
@@ -98,3 +98,22 @@ def handle_music_command(user_input: str):
         "action": action,
         "player": player
     }
+
+def get_available_players():
+    import subprocess
+
+    try:
+        result = subprocess.run(
+            ["playerctl", "-l"],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            return []
+
+        players = result.stdout.strip().split("\n")
+        return [p for p in players if p.strip()]
+
+    except Exception:
+        return []
