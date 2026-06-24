@@ -5,6 +5,7 @@ from app_control import open_app, CURRENT_OS_LABEL
 from system_info import handle_system_question
 from calculator import calculate
 from volume_control import handle_volume_command
+from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command, get_available_players
 
 def handle_local_command(user_input: str):
@@ -73,7 +74,6 @@ def process_music_command(user_input: str):
         else:
             print("\nLiq: I could not find any active players right now.\n")
             return True
-
     else:
         success, message = run_music_command(
             music_result["action"],
@@ -132,6 +132,13 @@ def main():
                         continue
 
                     if process_music_command(user_input):
+                        continue
+
+                    file_result = handle_file_command(user_input)
+                    if file_result is not None:
+                        success, message = file_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
                         continue
 
                     local_result = handle_local_command(user_input)
@@ -194,6 +201,13 @@ def main():
                         continue
 
                     if process_music_command(user_input):
+                        continue
+
+                    file_result = handle_file_command(user_input)
+                    if file_result is not None:
+                        success, message = file_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
                         continue
 
                     local_result = handle_local_command(user_input)
