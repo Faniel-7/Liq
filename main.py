@@ -4,6 +4,7 @@ from speak import speak
 from app_control import open_app, CURRENT_OS_LABEL
 from system_info import handle_system_question
 from calculator import calculate
+from volume_control import handle_volume_command
 from media_control import handle_music_command, run_music_command, get_available_players
 
 def handle_local_command(user_input: str):
@@ -123,11 +124,16 @@ def main():
                     if not user_input:
                         continue
 
-                   
+                    volume_result = handle_volume_command(user_input)
+                    if volume_result is not None:
+                        success, message = volume_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
+
                     if process_music_command(user_input):
                         continue
 
-                    
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
                         success, message = local_result
@@ -141,7 +147,6 @@ def main():
                         speak(calc_reply)
                         continue
 
-                    
                     system_reply = handle_system_question(user_input)
                     if system_reply:
                         print(f"\nLiq: {system_reply}\n")
@@ -181,11 +186,16 @@ def main():
                         print("Goodbye.")
                         return
 
-            
+                    volume_result = handle_volume_command(user_input)
+                    if volume_result is not None:
+                        success, message = volume_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
+
                     if process_music_command(user_input):
                         continue
 
-                  
                     local_result = handle_local_command(user_input)
                     if local_result is not None:
                         success, message = local_result
@@ -193,14 +203,12 @@ def main():
                         speak(message)
                         continue
 
-                 
                     calc_reply = calculate(user_input)
                     if calc_reply:
                         print(f"\nLiq: {calc_reply}\n")
                         speak(calc_reply)
                         continue
 
-                   
                     system_reply = handle_system_question(user_input)
                     if system_reply:
                         print(f"\nLiq: {system_reply}\n")
@@ -225,7 +233,6 @@ def main():
         except KeyboardInterrupt:
             print("\nGoodbye.")
             return
-
         except EOFError:
             print("\nGoodbye.")
             return
