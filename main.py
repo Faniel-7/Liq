@@ -5,8 +5,9 @@ from app_control import open_app, CURRENT_OS_LABEL
 from system_info import handle_system_question
 from calculator import calculate
 from volume_control import handle_volume_command
+from web_control import handle_web_command
 from file_manager import handle_file_command
-from media_control import handle_music_command, run_music_command, get_available_players
+from media_control import handle_music_command, run_music_command
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -43,8 +44,8 @@ def process_music_command(user_input: str):
     if music_result is None:
         return False
 
-    if music_result["needs_player"]:
-        players = music_result["available_players"]
+    if music_result.get("ask_player"):
+        players = music_result.get("players", [])
 
         if players:
             print("\nWhich player should I use?")
@@ -70,14 +71,14 @@ def process_music_command(user_input: str):
                 print("\nLiq: I could not understand the player choice.\n")
                 return True
 
-            success, message = run_music_command("play-pause", selected_player)
+            success, message = run_music(music_result["action"], selected_player)
         else:
             print("\nLiq: I could not find any active players right now.\n")
             return True
     else:
-        success, message = run_music_command(
+        success, message = run_music(
             music_result["action"],
-            music_result["player"]
+            music_result.get("player")
         )
 
     print(f"\nLiq: {message}\n")
@@ -132,6 +133,13 @@ def main():
                         continue
 
                     if process_music_command(user_input):
+                        continue
+
+                    web_result = handle_web_command(user_input)
+                    if web_result is not None:
+                        success, message = web_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
                         continue
 
                     file_result = handle_file_command(user_input)
@@ -201,6 +209,13 @@ def main():
                         continue
 
                     if process_music_command(user_input):
+                        continue
+
+                    web_result = handle_web_command(user_input)
+                    if web_result is not None:
+                        success, message = web_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
                         continue
 
                     file_result = handle_file_command(user_input)
