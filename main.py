@@ -8,6 +8,7 @@ from volume_control import handle_volume_command
 from web_control import handle_web_command
 from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command
+from notes import handle_note_command
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -135,6 +136,13 @@ def main():
                     if process_music_command(user_input):
                         continue
 
+                    note_result = handle_note_command(user_input)
+                    if note_result is not None:
+                         success, message = note_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
+
                     web_result = handle_web_command(user_input)
                     if web_result is not None:
                         success, message = web_result
@@ -210,6 +218,13 @@ def main():
 
                     if process_music_command(user_input):
                         continue
+
+                    note_result = handle_note_command(user_input)
+                    if note_result is not None:
+                         success, message = note_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
 
                     web_result = handle_web_command(user_input)
                     if web_result is not None:
