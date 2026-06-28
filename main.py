@@ -5,10 +5,11 @@ from app_control import open_app, CURRENT_OS_LABEL
 from system_info import handle_system_question
 from calculator import calculate
 from volume_control import handle_volume_command
+from notes import handle_note_command
+from reminders import handle_reminder_command, start_reminder_watcher
 from web_control import handle_web_command
 from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command
-from notes import handle_note_command
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -45,8 +46,10 @@ def process_music_command(user_input: str):
     if music_result is None:
         return False
 
-    if music_result.get("ask_player"):
-        players = music_result.get("players", [])
+    needs_player = music_result.get("ask_player", music_result.get("needs_player", False))
+
+    if needs_player:
+        players = music_result.get("players", music_result.get("available_players", []))
 
         if players:
             print("\nWhich player should I use?")
@@ -72,12 +75,12 @@ def process_music_command(user_input: str):
                 print("\nLiq: I could not understand the player choice.\n")
                 return True
 
-            success, message = run_music(music_result["action"], selected_player)
+            success, message = run_music_command(music_result["action"], selected_player)
         else:
             print("\nLiq: I could not find any active players right now.\n")
             return True
     else:
-        success, message = run_music(
+        success, message = run_music_command(
             music_result["action"],
             music_result.get("player")
         )
@@ -93,6 +96,16 @@ def main():
             "content": SYSTEM_PROMPT
         }
     ]
+
+    def announce_reminder(reminder):
+        text = reminder["text"].strip().rstrip(".!?")
+        if text.lower().startswith("to "):
+            text = text[3:].strip()
+        message = f"Hey, time to {text}."
+        print(f"\nLiq: {message}\n")
+        speak(message)
+
+    start_reminder_watcher(announce_reminder)
 
     print("\n=========================")
     print("        LIQ ASSISTANT")
@@ -138,10 +151,17 @@ def main():
 
                     note_result = handle_note_command(user_input)
                     if note_result is not None:
-                         success, message = note_result
-                         print(f"\nLiq: {message}\n")
-                         speak(message)
-                         continue
+                        success, message = note_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
+
+                    reminder_result = handle_reminder_command(user_input)
+                    if reminder_result is not None:
+                        success, message = reminder_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
 
                     web_result = handle_web_command(user_input)
                     if web_result is not None:
@@ -221,10 +241,17 @@ def main():
 
                     note_result = handle_note_command(user_input)
                     if note_result is not None:
-                         success, message = note_result
-                         print(f"\nLiq: {message}\n")
-                         speak(message)
-                         continue
+                        success, message = note_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
+
+                    reminder_result = handle_reminder_command(user_input)
+                    if reminder_result is not None:
+                        success, message = reminder_result
+                        print(f"\nLiq: {message}\n")
+                        speak(message)
+                        continue
 
                     web_result = handle_web_command(user_input)
                     if web_result is not None:
