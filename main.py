@@ -11,6 +11,7 @@ from web_control import handle_web_command
 from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command
 from tasks import handle_task_command
+from calendar_manager import handle_calendar_command, start_event_watcher
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -106,7 +107,13 @@ def main():
         print(f"\nLiq: {message}\n")
         speak(message)
 
+    def announce_event(event):
+        message = f"Hey, it is time for {event['title']}."
+        print(f"\nLiq: {message}\n")
+        speak(message)
+
     start_reminder_watcher(announce_reminder)
+    start_event_watcher(announce_event)
 
     print("\n=========================")
     print("        LIQ ASSISTANT")
@@ -192,6 +199,13 @@ def main():
                         print(f"\nLiq: {message}\n")
                         speak(message)
                         continue
+
+                    calendar_result = handle_calendar_command(user_input)
+                    if calendar_result is not None:
+                         success, message = calendar_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
 
                     calc_reply = calculate(user_input)
                     if calc_reply:
@@ -289,6 +303,13 @@ def main():
                         print(f"\nLiq: {message}\n")
                         speak(message)
                         continue
+
+                    calendar_result = handle_calendar_command(user_input)
+                    if calendar_result is not None:
+                         success, message = calendar_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
 
                     calc_reply = calculate(user_input)
                     if calc_reply:
