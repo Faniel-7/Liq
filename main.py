@@ -10,6 +10,7 @@ from reminders import handle_reminder_command, start_reminder_watcher
 from web_control import handle_web_command
 from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command
+from tasks import handle_task_command
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -156,6 +157,14 @@ def main():
                         speak(message)
                         continue
 
+                    task_result = handle_task_command(user_input)
+                    
+                    if task_result is not None:
+                         success, message = task_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
+ 
                     reminder_result = handle_reminder_command(user_input)
                     if reminder_result is not None:
                         success, message = reminder_result
@@ -245,6 +254,13 @@ def main():
                         print(f"\nLiq: {message}\n")
                         speak(message)
                         continue
+
+                    task_result = handle_task_command(user_input)
+                    if task_result is not None:
+                         success, message = task_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
 
                     reminder_result = handle_reminder_command(user_input)
                     if reminder_result is not None:
