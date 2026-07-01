@@ -12,6 +12,7 @@ from file_manager import handle_file_command
 from media_control import handle_music_command, run_music_command
 from tasks import handle_task_command
 from calendar_manager import handle_calendar_command, start_event_watcher
+from device_control import handle_device_command
 
 def handle_local_command(user_input: str):
     text = user_input.strip().lower()
@@ -147,6 +148,13 @@ def main():
                     if not user_input:
                         continue
 
+                    device_result = handle_device_command(user_input)
+                    if device_result is not None:
+                         success, message = device_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
+
                     volume_result = handle_volume_command(user_input)
                     if volume_result is not None:
                         success, message = volume_result
@@ -251,6 +259,13 @@ def main():
                     if user_input.lower() in ["exit", "quit", "bye"]:
                         print("Goodbye.")
                         return
+                    
+                    device_result = handle_device_command(user_input)
+                    if device_result is not None:
+                         success, message = device_result
+                         print(f"\nLiq: {message}\n")
+                         speak(message)
+                         continue
 
                     volume_result = handle_volume_command(user_input)
                     if volume_result is not None:
